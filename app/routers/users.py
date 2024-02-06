@@ -24,6 +24,12 @@ def create_user(user: UserCreate, db: Session = Depends(database.get_db)):
     return new_user
 
 
+@router.get("/me", response_model=UserResponse)
+def me(current_user: int = Depends(oauth2.get_current_user)):
+    print(current_user)
+    return current_user
+
+
 @router.get("/{id}", response_model=UserResponse)
 def get_user(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
     user = db.query(User).filter(User.id == id).first()
