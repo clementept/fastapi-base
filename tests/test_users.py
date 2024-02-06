@@ -13,9 +13,8 @@ def test_create_user(client):
     assert res.status_code == 201
     assert new_user.email == "hello@mail.com"
 
-def test_get_user_by_id(client, test_user):
-    res = client.get(f"/users/{int(test_user["id"])}")
-
+def test_get_user_by_id(authorized_client, test_user):
+    res = authorized_client.get(f"/users/{int(test_user["id"])}")
     res_json = res.json()
 
     assert res.status_code == 200
