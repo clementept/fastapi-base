@@ -12,3 +12,13 @@ def test_create_user(db_client):
     new_user = UserResponse(**res.json())
     assert res.status_code == 201
     assert new_user.email == "hello@mail.com"
+
+def test_get_user_by_id(db_client, test_user):
+    res = db_client.get(f"/users/{int(test_user["id"])}")
+
+    res_json = res.json()
+
+    assert res.status_code == 200
+    assert res_json['id'] == test_user["id"]
+    assert res_json['email'] == test_user["email"]
+    assert res_json['created_at'] == test_user["created_at"]
