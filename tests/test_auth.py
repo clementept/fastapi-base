@@ -5,8 +5,8 @@ from app.config import settings
 from app.schemas.login import LoginResponse
 
 
-def test_login_user(db_client, test_user):
-    res = db_client.post(
+def test_login_user(client, test_user):
+    res = client.post(
         "/login",
         data={"username": test_user["email"], "password": test_user["password"]},
     )
@@ -35,7 +35,7 @@ def test_login_user(db_client, test_user):
         ("hello@mail.com", None, 422),
     ],
 )
-def test_incorrect_login(db_client, email, password, status_code):
-    res = db_client.post("/login", data={"username": email, "password": password})
+def test_incorrect_login(client, email, password, status_code):
+    res = client.post("/login", data={"username": email, "password": password})
 
     assert res.status_code == status_code

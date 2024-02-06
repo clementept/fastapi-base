@@ -18,8 +18,8 @@ TestingSessionLocal = sessionmaker(
 
 
 @pytest.fixture
-def test_user(db_client):
-    res = db_client.post(
+def test_user(client):
+    res = client.post(
         "/users", json={"email": "user@mail.com", "password": "123"})
 
     new_user = res.json()
@@ -29,8 +29,8 @@ def test_user(db_client):
 
 
 @pytest.fixture
-def test_user2(db_client):
-    res = db_client.post(
+def test_user2(client):
+    res = client.post(
         "/users", json={"email": "user2@mail.com", "password": "123"})
 
     new_user = res.json()
@@ -51,7 +51,7 @@ def session():
 
 
 @pytest.fixture
-def db_client(session):
+def client(session):
     def override_get_db():
         try:
             yield session
@@ -68,10 +68,10 @@ def token(test_user):
 
 
 @pytest.fixture
-def authorized_client(db_client, token):
-    db_client.headers = {
-        **db_client.headers,
+def authorized_client(client, token):
+    client.headers = {
+        **client.headers,
         "Authorization": f"Bearer {token}"
     }
 
-    return db_client
+    return client

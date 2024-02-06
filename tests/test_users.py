@@ -6,15 +6,15 @@ from app.schemas.login import LoginResponse
 from app.schemas.user import UserResponse
 
 
-def test_create_user(db_client):
-    res = db_client.post("/users", json={"email": "hello@mail.com", "password": "123"})
+def test_create_user(client):
+    res = client.post("/users", json={"email": "hello@mail.com", "password": "123"})
 
     new_user = UserResponse(**res.json())
     assert res.status_code == 201
     assert new_user.email == "hello@mail.com"
 
-def test_get_user_by_id(db_client, test_user):
-    res = db_client.get(f"/users/{int(test_user["id"])}")
+def test_get_user_by_id(client, test_user):
+    res = client.get(f"/users/{int(test_user["id"])}")
 
     res_json = res.json()
 
