@@ -2,7 +2,7 @@ import pytest
 from jose import jwt
 
 from app.config import settings
-from app.schemas.login import LoginResponse
+from app.schemas.login import LoginResponseSchema
 
 
 def test_login_user(client, test_user):
@@ -10,7 +10,7 @@ def test_login_user(client, test_user):
         "/login",
         data={"username": test_user["email"], "password": test_user["password"]},
     )
-    login_res = LoginResponse(**res.json())
+    login_res = LoginResponseSchema(**res.json())
     print(res.json())
 
     payload = jwt.decode(

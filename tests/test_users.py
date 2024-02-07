@@ -1,9 +1,10 @@
-from app.schemas.user import UserResponse
+from app.schemas.user import UserResponseSchema
+
 
 def test_create_user(client):
     res = client.post("/users", json={"email": "hello@mail.com", "password": "123"})
 
-    new_user = UserResponse(**res.json())
+    new_user = UserResponseSchema(**res.json())
     assert res.status_code == 201
     assert new_user.email == "hello@mail.com"
 

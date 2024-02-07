@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.schemas.auth_token import TokenData
+from app.models.user import UserModel
+from app.schemas.auth_token import TokenDataSchema
 
 from . import database
 from .config import settings
@@ -37,7 +37,7 @@ def verify_access_token(token: str, credentials_exception):
         if id is None:
             raise credentials_exception
 
-        token_data = TokenData(id=str(id))
+        token_data = TokenDataSchema(id=str(id))
     except JWTError:
         raise credentials_exception
 
@@ -55,6 +55,6 @@ def get_current_user(
 
     token = verify_access_token(token, credentials_exception)
 
-    user = db.query(User).filter(User.id == token.id).first()
+    user = db.query(UserModel).filter(UserModel.id == token.id).first()
 
     return user

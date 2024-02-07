@@ -3,12 +3,12 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
 
-class UserCreate(BaseModel):
+class UserCreateSchema(BaseModel):
     email: EmailStr
     password: str
 
 
-class UserResponse(BaseModel):
+class UserResponseSchema(BaseModel):
     id: int
     email: EmailStr
     created_at: datetime

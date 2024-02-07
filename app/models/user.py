@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import text
 from ..database import Base
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, nullable=False)

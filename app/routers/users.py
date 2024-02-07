@@ -2,20 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import oauth2
-from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
+from app.models.user import UserModel
+from app.schemas.user import UserCreateSchema, UserResponseSchema
 
 from .. import crypto, database
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(database.get_db)):
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
+def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
     hashed_password = crypto.create_hash(user.password)
     user.password = hashed_password
 
-    new_user = User(**user.model_dump())
+    new_user = UserModel(**user.model_dump())
 
     db.add(new_user)
     db.commit()
@@ -24,15 +24,19 @@ def create_user(user: UserCreate, db: Session = Depends(database.get_db)):
     return new_user
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponseSchema)
 def me(current_user: int = Depends(oauth2.get_current_user)):
     print(current_user)
     return current_user
 
 
-@router.get("/{id}", response_model=UserResponse)
-def get_user(id: int, db: Session = Depends(database.get_db), current_user: int = Depends(oauth2.get_current_user)):
-    user = db.query(User).filter(User.id == id).first()
+@router.get("/{id}", response_model=UserResponseSchema)
+def get_user(
+    id: int,
+    db: Session = Depends(database.get_db),
+    current_user: int = Depends(oauth2.get_current_user),
+):
+    user = db.query(UserModel).filter(UserModel.id == id).first()
 
     if not user:
         raise HTTPException(

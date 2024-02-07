@@ -3,5 +3,5 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class TokenData(BaseModel):
+class TokenDataSchema(BaseModel):
     id: Optional[str] = None
