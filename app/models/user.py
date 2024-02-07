@@ -1,7 +1,7 @@
 from sqlalchemy import TIMESTAMP, Column, Integer, String
 from sqlalchemy.sql.expression import text
 
-from ..database import Base
+from ..backend.database import Base
 
 
 class UserModel(Base):

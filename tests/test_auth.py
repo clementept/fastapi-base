@@ -1,7 +1,7 @@
 import pytest
 from jose import jwt
 
-from app.config import settings
+from app.backend.config import settings
 from app.schemas.login import LoginResponseSchema
 
 

@@ -3,10 +3,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.config import settings
-from app.database import Base, get_db
+from app.backend.config import settings
+from app.backend.database import Base, get_db
 from app.main import app
-from app.oauth2 import create_access_token
+from app.services.oauth2 import create_access_token
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{
     settings.database_hostname}:{settings.database_port}/{settings.test_database_name}'

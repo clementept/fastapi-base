@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 from app.models.user import UserModel
 from app.schemas.auth_token import TokenDataSchema
 
-from . import database
-from .config import settings
+from ..backend import database
+from ..backend.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
