@@ -11,4 +11,6 @@ class UserCreateSchema(BaseModel):
 class UserResponseSchema(BaseModel):
     id: int
     email: EmailStr
+    is_active: bool
+    activation_code: str | None
     created_at: datetime
