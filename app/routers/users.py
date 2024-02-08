@@ -1,11 +1,13 @@
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.services import oauth2
-from ..backend import database
 from app.models.user import UserModel
 from app.schemas.user import UserCreateSchema, UserResponseSchema
+from app.services import oauth2
 
+from ..backend import database
 from ..services import crypto
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -17,6 +19,7 @@ def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
     user.password = hashed_password
 
     new_user = UserModel(**user.model_dump())
+    new_user.activation_code = str(uuid.uuid4())
 
     db.add(new_user)
     db.commit()
