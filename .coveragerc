@@ -1,0 +1,5 @@
+[run]
+omit = tests/conftest.py, app/backend/database.py, app/services/oauth2.py	
+
+[html]
+directory = coverage_html_report

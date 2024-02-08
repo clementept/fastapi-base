@@ -47,7 +47,7 @@ jobs:
       - name: Install all dependencies
         run: pip install -r requirements.txt
 
-      - name: Test with pytest
+      - name: Run tests with coverage
         run: |
           pip install pytest
-          pytest
+          pytest --cov=.
