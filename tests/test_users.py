@@ -17,6 +17,12 @@ def test_get_user_by_id(authorized_client, test_active_user):
     assert res_json['email'] == test_active_user["email"]
     assert res_json['created_at'] == test_active_user["created_at"]
 
+def test_get_user_by_id_inexistent_id(authorized_client):
+    res = authorized_client.get(f"/users/8888")
+
+    assert res.status_code == 404
+    assert res.json()['detail'] == "User with id 8888 not found"
+
 def test_get_user_by_id_unauthorized(client, test_active_user):
     res = client.get(f"/users/{int(test_active_user["id"])}")
     res_json = res.json()
@@ -24,7 +30,7 @@ def test_get_user_by_id_unauthorized(client, test_active_user):
     assert res.status_code == 401
 
 def test_get_user_me(authorized_client, test_active_user):
-    res = authorized_client.get(f"/users/{int(test_active_user["id"])}")
+    res = authorized_client.get(f"/users/me")
 
     res_json = res.json()
 
