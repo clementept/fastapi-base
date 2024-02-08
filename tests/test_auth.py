@@ -15,7 +15,8 @@ def test_login_inactive_user(client, test_inactive_user):
     )
 
     assert res.status_code == 403
-    assert res.json()['detail'] == 'User is not active'
+    assert res.json()["detail"] == "User is not active"
+
 
 def test_login_active_user(client, test_active_user):
     res = client.post(

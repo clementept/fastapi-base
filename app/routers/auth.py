@@ -2,13 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from ..services import crypto
-from ..backend import database
-
 from app.models.user import UserModel
 from app.schemas.login import LoginResponseSchema
 
-from ..services import oauth2
+from ..backend import database
+from ..services import crypto, oauth2
 
 router = APIRouter(tags=["Auth"])
 
@@ -24,13 +22,13 @@ def login(
 
     if not user or not crypto.verify_hash(user_credentials.password, user.password):
         raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials"
-    )
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials"
+        )
 
     if not user.is_active:
         raise HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail="User is not active"
-    )
+            status_code=status.HTTP_403_FORBIDDEN, detail="User is not active"
+        )
 
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 
