@@ -17,6 +17,12 @@ def test_get_user_by_id(authorized_client, test_active_user):
     assert res_json['email'] == test_active_user["email"]
     assert res_json['created_at'] == test_active_user["created_at"]
 
+def test_get_user_by_id_unauthorized(client, test_active_user):
+    res = client.get(f"/users/{int(test_active_user["id"])}")
+    res_json = res.json()
+
+    assert res.status_code == 401
+
 def test_get_user_me(authorized_client, test_active_user):
     res = authorized_client.get(f"/users/{int(test_active_user["id"])}")
 
