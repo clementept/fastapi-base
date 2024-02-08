@@ -14,3 +14,4 @@ class UserResponseSchema(BaseModel):
     is_active: bool
     activation_code: str | None
     created_at: datetime
+    updated_at: datetime
