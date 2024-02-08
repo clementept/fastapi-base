@@ -8,26 +8,45 @@ def test_create_user(client):
     assert res.status_code == 201
     assert new_user.email == "hello@mail.com"
 
-def test_get_user_by_id(authorized_client, test_user):
-    res = authorized_client.get(f"/users/{int(test_user["id"])}")
+def test_get_user_by_id(authorized_client, test_active_user):
+    res = authorized_client.get(f"/users/{int(test_active_user["id"])}")
     res_json = res.json()
 
     assert res.status_code == 200
-    assert res_json['id'] == test_user["id"]
-    assert res_json['email'] == test_user["email"]
-    assert res_json['created_at'] == test_user["created_at"]
+    assert res_json['id'] == test_active_user["id"]
+    assert res_json['email'] == test_active_user["email"]
+    assert res_json['created_at'] == test_active_user["created_at"]
 
-def test_get_user_me(authorized_client, test_user):
-    res = authorized_client.get(f"/users/{int(test_user["id"])}")
+def test_get_user_me(authorized_client, test_active_user):
+    res = authorized_client.get(f"/users/{int(test_active_user["id"])}")
 
     res_json = res.json()
 
     assert res.status_code == 200
-    assert res_json['id'] == test_user["id"]
-    assert res_json['email'] == test_user["email"]
-    assert res_json['created_at'] == test_user["created_at"]
+    assert res_json['id'] == test_active_user["id"]
+    assert res_json['email'] == test_active_user["email"]
+    assert res_json['created_at'] == test_active_user["created_at"]
 
-def test_get_user_me_unauthorized(client, test_user):
-    res = client.get(f"/users/{int(test_user["id"])}")
+def test_get_user_me_unauthorized(client, test_inactive_user):
+    res = client.get(f"/users/{int(test_inactive_user["id"])}")
 
     assert res.status_code == 401
+
+def test_user_activation_wrong_code(client, test_inactive_user):
+    res = client.post("/users/activate?activation_code=123")
+
+    print(res.json())
+
+    assert res.status_code == 400
+    assert res.json()['detail'] == 'Wrong activation code'
+
+def test_user_activation_correct_code(client, test_inactive_user):
+    assert test_inactive_user['is_active'] == False
+
+    res = client.post(f"/users/activate?activation_code={test_inactive_user['activation_code']}")
+
+    print(res.json())
+
+    assert res.status_code == 200
+    assert res.json()['is_active'] == True
+    assert res.json()['activation_code'] == None

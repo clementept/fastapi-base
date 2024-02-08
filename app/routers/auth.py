@@ -22,12 +22,15 @@ def login(
         db.query(UserModel).filter(UserModel.email == user_credentials.username).first()
     )
 
-    exception = HTTPException(
-        status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials"
+    if not user or not crypto.verify_hash(user_credentials.password, user.password):
+        raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials"
     )
 
-    if not user or not crypto.verify_hash(user_credentials.password, user.password):
-        raise exception
+    if not user.is_active:
+        raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN, detail="User is not active"
+    )
 
     access_token = oauth2.create_access_token(data={"user_id": user.id})
 

@@ -57,4 +57,10 @@ def get_current_user(
 
     user = db.query(UserModel).filter(UserModel.id == token.id).first()
 
+    if not user.is_active:
+        raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="User is not active",
+    )
+
     return user

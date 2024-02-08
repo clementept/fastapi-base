@@ -18,12 +18,24 @@ TestingSessionLocal = sessionmaker(
 
 
 @pytest.fixture
-def test_user(client):
+def test_inactive_user(client):
     res = client.post(
         "/users", json={"email": "user@mail.com", "password": "123"})
 
     new_user = res.json()
     new_user["password"] = "123"
+
+    return new_user
+
+@pytest.fixture
+def test_active_user(client):
+    res = client.post(
+        "/users", json={"email": "user@mail.com", "password": "123"})
+
+    new_user = res.json()
+    new_user["password"] = "123"
+
+    client.post(f"/users/activate?activation_code={new_user['activation_code']}")
 
     return new_user
 
@@ -63,8 +75,8 @@ def client(session):
 
 
 @pytest.fixture
-def token(test_user):
-    return create_access_token({"user_id": test_user['id']})
+def token(test_active_user):
+    return create_access_token({"user_id": test_active_user['id']})
 
 
 @pytest.fixture

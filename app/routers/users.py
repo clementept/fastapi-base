@@ -34,6 +34,27 @@ def me(current_user: int = Depends(oauth2.get_current_user)):
     return current_user
 
 
+@router.post("/activate", response_model=UserResponseSchema)
+def activate_user(activation_code: str, db: Session = Depends(database.get_db)):
+    user_query = db.query(UserModel).filter(
+        UserModel.activation_code == activation_code
+    )
+    user = user_query.first()
+
+    if user is None or user.activation_code != activation_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Wrong activation code"
+        )
+
+    user.is_active = True
+    user.activation_code = None
+
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+
 @router.get("/{id}", response_model=UserResponseSchema)
 def get_user(
     id: int,

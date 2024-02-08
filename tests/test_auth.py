@@ -5,10 +5,25 @@ from app.backend.config import settings
 from app.schemas.login import LoginResponseSchema
 
 
-def test_login_user(client, test_user):
+def test_login_inactive_user(client, test_inactive_user):
     res = client.post(
         "/login",
-        data={"username": test_user["email"], "password": test_user["password"]},
+        data={
+            "username": test_inactive_user["email"],
+            "password": test_inactive_user["password"],
+        },
+    )
+
+    assert res.status_code == 403
+    assert res.json()['detail'] == 'User is not active'
+
+def test_login_active_user(client, test_active_user):
+    res = client.post(
+        "/login",
+        data={
+            "username": test_active_user["email"],
+            "password": test_active_user["password"],
+        },
     )
     login_res = LoginResponseSchema(**res.json())
     print(res.json())
@@ -22,7 +37,7 @@ def test_login_user(client, test_user):
 
     assert res.status_code == 200
     assert login_res.token_type == "bearer"
-    assert id == test_user["id"]
+    assert id == test_active_user["id"]
 
 
 @pytest.mark.parametrize(
