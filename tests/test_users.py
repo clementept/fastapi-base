@@ -47,8 +47,6 @@ def test_get_user_me_unauthorized(client, test_inactive_user):
 def test_user_activation_wrong_code(client, test_inactive_user):
     res = client.post("/users/activate?activation_code=123")
 
-    print(res.json())
-
     assert res.status_code == 400
     assert res.json()['detail'] == 'Wrong activation code'
 
@@ -56,8 +54,6 @@ def test_user_activation_correct_code(client, test_inactive_user):
     assert test_inactive_user['is_active'] == False
 
     res = client.post(f"/users/activate?activation_code={test_inactive_user['activation_code']}")
-
-    print(res.json())
 
     assert res.status_code == 200
     assert res.json()['is_active'] == True

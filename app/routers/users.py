@@ -30,7 +30,6 @@ def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
 
 @router.get("/me", response_model=UserResponseSchema)
 def me(current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user)
     return current_user
 
 

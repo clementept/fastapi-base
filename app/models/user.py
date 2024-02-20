@@ -12,6 +12,8 @@ class UserModel(Base):
     password = Column(String, nullable=False)
     is_active = Column(Boolean, nullable=False, server_default=false())
     activation_code = Column(String, nullable=True, server_default=null())
+    refresh_token = Column(String, nullable=True)
+    refresh_token_expires = Column(String, nullable=True)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
     )

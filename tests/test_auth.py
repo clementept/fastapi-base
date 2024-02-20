@@ -15,7 +15,7 @@ def test_login_inactive_user(client, test_inactive_user):
     )
 
     assert res.status_code == 403
-    assert res.json()["detail"] == "User is not active"
+    assert res.json() == {"detail": "User is not active"}
 
 
 def test_login_active_user(client, test_active_user):
@@ -27,7 +27,6 @@ def test_login_active_user(client, test_active_user):
         },
     )
     login_res = LoginResponseSchema(**res.json())
-    print(res.json())
 
     payload = jwt.decode(
         login_res.access_token,
@@ -38,6 +37,8 @@ def test_login_active_user(client, test_active_user):
 
     assert res.status_code == 200
     assert login_res.token_type == "bearer"
+    assert "access_token" in login_res.model_dump()
+    assert "refresh_token" in login_res.model_dump()
     assert id == test_active_user["id"]
 
 
@@ -55,3 +56,61 @@ def test_incorrect_login(client, email, password, status_code):
     res = client.post("/login", data={"username": email, "password": password})
 
     assert res.status_code == status_code
+
+
+def test_refresh_user(client, test_active_user):
+    login_res = client.post(
+        "/login",
+        data={
+            "username": test_active_user["email"],
+            "password": test_active_user["password"],
+        },
+    )
+    login_res = LoginResponseSchema(**login_res.json())
+
+    refresh_token = login_res.refresh_token
+
+    client.cookies.update({"refresh_token": refresh_token}),
+
+    refresh_res = client.post(
+        "/login/refresh",
+    )
+
+    refresh_res_json = refresh_res.json()
+    assert refresh_res.status_code == 200
+    assert refresh_res_json["token_type"] == "bearer"
+    assert "access_token" in refresh_res_json
+    assert "refresh_token" not in refresh_res_json
+
+
+def test_refresh_user_no_refresh_token_cookie(client, test_active_user):
+    login_res = client.post(
+        "/login",
+        data={
+            "username": test_active_user["email"],
+            "password": test_active_user["password"],
+        },
+    )
+    login_res = LoginResponseSchema(**login_res.json())
+
+    refresh_res = client.post("/login/refresh")
+
+    assert refresh_res.status_code == 401
+
+
+def test_refresh_user_invalid_token(client, test_active_user):
+    login_res = client.post(
+        "/login",
+        data={
+            "username": test_active_user["email"],
+            "password": test_active_user["password"],
+        },
+    )
+    login_res = LoginResponseSchema(**login_res.json())
+
+    client.cookies.update({"refresh_token": "abc"})
+    refresh_res = client.post("/login/refresh")
+
+    refresh_res_json = refresh_res.json()
+    assert refresh_res.status_code == 401
+    assert refresh_res_json == {"detail": "Invalid refresh token"}
