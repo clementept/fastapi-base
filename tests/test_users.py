@@ -58,3 +58,15 @@ def test_user_activation_correct_code(client, test_inactive_user):
     assert res.status_code == 200
     assert res.json()['is_active'] == True
     assert res.json()['activation_code'] == None
+
+def test_get_users_admin(client, authorized_admin):
+    res = client.get(f"/users")
+
+    print(res.json())
+    assert res.status_code == 200
+
+def test_get_users_no_admin(client, authorized_client):
+    res = client.get(f"/users")
+
+    print(res.json())
+    assert res.status_code == 403

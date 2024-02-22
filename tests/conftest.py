@@ -3,9 +3,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from alembic import op
 from app.backend.config import settings
 from app.backend.database import Base, get_db
 from app.main import app
+from app.models.user import UserModel
 from app.services.oauth2 import create_access_token
 
 SQLALCHEMY_DATABASE_URL = f'postgresql://{settings.database_username}:{settings.database_password}@{
@@ -16,6 +18,8 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
 
+ADMIN_EMAIL = "admin@test.com"
+ADMIN_PASSWORD = 'adminpass'
 
 @pytest.fixture
 def test_inactive_user(client):
@@ -85,5 +89,23 @@ def authorized_client(client, token):
         **client.headers,
         "Authorization": f"Bearer {token}"
     }
+
+    return client
+
+@pytest.fixture
+def authorized_admin(client, session):
+    # Create the admin user using the SQLAlchemy ORM
+    admin_user = UserModel(email=ADMIN_EMAIL, password=ADMIN_PASSWORD, is_active=True, is_admin=True)
+    
+    # Add the user to the session and commit the transaction
+    session.add(admin_user)
+    session.commit()
+    session.refresh(admin_user)
+
+    token = create_access_token({"user_id": admin_user.id})
+    client.headers = {
+        **client.headers,
+        "Authorization": f"Bearer {token}"
+    }    
 
     return client

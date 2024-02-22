@@ -35,7 +35,7 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN, detail="User is not active"
         )
 
-    access_token = oauth2.create_access_token(data={"user_id": user.id})
+    access_token = oauth2.create_access_token(data={"user_id": user.id, "is_admin": user.is_admin})
     refresh_token = oauth2.create_refresh_token(db, user.id)
 
     content = {

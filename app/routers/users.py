@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -26,6 +27,16 @@ def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
     db.refresh(new_user)
 
     return new_user
+
+
+@router.get("", response_model=List[UserResponseSchema])
+def get_users(
+    db: Session = Depends(database.get_db),
+    current_user: int = Depends(oauth2.get_current_admin),
+):
+    users = db.query(UserModel).all()
+
+    return users
 
 
 @router.get("/me", response_model=UserResponseSchema)
