@@ -71,11 +71,20 @@ def get_current_user(
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not authenticated",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    phorbiden_exception = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    token = verify_access_token(token, credentials_exception)
+    if token is None:
+        raise credentials_exception
+
+    token = verify_access_token(token, phorbiden_exception)
 
     user = db.query(UserModel).filter(UserModel.id == token.id).first()
 

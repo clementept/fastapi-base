@@ -38,7 +38,8 @@ def test_login_active_user(client, test_active_user):
     assert res.status_code == 200
     assert login_res.token_type == "bearer"
     assert "access_token" in login_res.model_dump()
-    assert "refresh_token" in login_res.model_dump()
+    assert "refresh_token" in res.cookies
+    assert "refresh_token" not in login_res.model_dump()
     assert id == test_active_user["id"]
 
 
@@ -66,9 +67,8 @@ def test_refresh_user(client, test_active_user):
             "password": test_active_user["password"],
         },
     )
-    login_res = LoginResponseSchema(**login_res.json())
 
-    refresh_token = login_res.refresh_token
+    refresh_token = login_res.cookies["refresh_token"]
 
     client.cookies.update({"refresh_token": refresh_token}),
 
@@ -84,18 +84,10 @@ def test_refresh_user(client, test_active_user):
 
 
 def test_refresh_user_no_refresh_token_cookie(client, test_active_user):
-    login_res = client.post(
-        "/login",
-        data={
-            "username": test_active_user["email"],
-            "password": test_active_user["password"],
-        },
-    )
-    login_res = LoginResponseSchema(**login_res.json())
-
     refresh_res = client.post("/login/refresh")
 
     assert refresh_res.status_code == 401
+    assert refresh_res.json()["detail"] == "Invalid refresh token"
 
 
 def test_refresh_user_invalid_token(client, test_active_user):

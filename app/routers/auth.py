@@ -1,12 +1,14 @@
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import pytz
 from fastapi import APIRouter, Cookie, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from app.backend.config import settings
 from app.models.user import UserModel
-from app.schemas.login import LoginResponseSchema, RefreshAccessTokenResponseSchema
+from app.schemas.login import LoginResponseSchema
 
 from ..backend import database
 from ..services import crypto, oauth2
@@ -36,14 +38,24 @@ async def login(
     access_token = oauth2.create_access_token(data={"user_id": user.id})
     refresh_token = oauth2.create_refresh_token(db, user.id)
 
-    return {
+    content = {
         "access_token": access_token,
         "token_type": "bearer",
-        "refresh_token": refresh_token,
     }
 
+    cookie_expire = datetime.now(UTC) + timedelta(
+        minutes=settings.jwt_refresh_token_expire_minutes
+    )
 
-@router.post("/login/refresh", response_model=RefreshAccessTokenResponseSchema)
+    response = JSONResponse(content=content)
+    response.set_cookie(
+        key="refresh_token", value=refresh_token, httponly=True, expires=cookie_expire
+    )
+
+    return response
+
+
+@router.post("/login/refresh", response_model=LoginResponseSchema)
 async def refresh(
     refresh_token: str = Cookie(None),
     db: Session = Depends(database.get_db),
