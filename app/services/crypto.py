@@ -1,7 +1,4 @@
-from cryptography.fernet import Fernet
 from passlib.context import CryptContext
-
-from app.backend.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

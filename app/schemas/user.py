@@ -15,3 +15,4 @@ class UserResponseSchema(BaseModel):
     activation_code: str | None
     created_at: datetime
     updated_at: datetime | None
+    is_admin: bool
