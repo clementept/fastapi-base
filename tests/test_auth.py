@@ -72,7 +72,7 @@ def test_refresh_user(client, test_active_user):
 
     client.cookies.update({"refresh_token": refresh_token}),
 
-    refresh_res = client.post(
+    refresh_res = client.get(
         "/login/refresh",
     )
 
@@ -84,7 +84,7 @@ def test_refresh_user(client, test_active_user):
 
 
 def test_refresh_user_no_refresh_token_cookie(client, test_active_user):
-    refresh_res = client.post("/login/refresh")
+    refresh_res = client.get("/login/refresh")
 
     assert refresh_res.status_code == 401
     assert refresh_res.json()["detail"] == "Invalid refresh token"
@@ -101,7 +101,7 @@ def test_refresh_user_invalid_token(client, test_active_user):
     login_res = LoginResponseSchema(**login_res.json())
 
     client.cookies.update({"refresh_token": "abc"})
-    refresh_res = client.post("/login/refresh")
+    refresh_res = client.get("/login/refresh")
 
     refresh_res_json = refresh_res.json()
     assert refresh_res.status_code == 401
