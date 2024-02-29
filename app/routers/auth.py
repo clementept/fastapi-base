@@ -1,7 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 import pytz
-from fastapi import APIRouter, Cookie, Depends, HTTPException, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -61,6 +61,38 @@ async def login(
     response.set_cookie(
         key="refresh_token", value=refresh_token, httponly=True, expires=cookie_expire
     )
+
+    return response
+
+
+@router.get("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(
+    request: Request,
+    response: Response,
+    db: Session = Depends(database.get_db),
+):
+    response.status_code = status.HTTP_204_NO_CONTENT
+    response.delete_cookie(
+        key="refresh_token", secure=True, samesite=None, httponly=True
+    )
+
+    cookies = request.cookies
+    refresh_token = cookies.get("refresh_token")
+
+    if not refresh_token:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    token_hash = str(hash(str(refresh_token)))
+
+    user = db.query(UserModel).filter(UserModel.refresh_token == token_hash).first()
+
+    if not user:
+        return response
+
+    user.refresh_token = None
+    user.refresh_token_expires = None
+
+    db.commit()
 
     return response
 

@@ -106,3 +106,9 @@ def test_refresh_user_invalid_token(client, test_active_user):
     refresh_res_json = refresh_res.json()
     assert refresh_res.status_code == 401
     assert refresh_res_json == {"detail": "Invalid refresh token"}
+
+
+def test_logout_endpoint(client):
+    logout_res = client.get("/logout")
+
+    assert logout_res.status_code == 204
