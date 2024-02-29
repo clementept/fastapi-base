@@ -35,7 +35,9 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN, detail="User is not active"
         )
 
-    access_token = oauth2.create_access_token(data={"user_id": user.id, "is_admin": user.is_admin})
+    access_token = oauth2.create_access_token(
+        data={"user_id": user.id, "is_admin": user.is_admin}
+    )
     refresh_token = oauth2.create_refresh_token(db, user.id)
 
     content = {
@@ -55,7 +57,7 @@ async def login(
     return response
 
 
-@router.post("/login/refresh", response_model=LoginResponseSchema)
+@router.get("/login/refresh", response_model=LoginResponseSchema)
 async def refresh(
     refresh_token: str = Cookie(None),
     db: Session = Depends(database.get_db),
