@@ -16,6 +16,14 @@ from ..services import crypto, oauth2
 router = APIRouter(tags=["Auth"])
 
 
+def getRoles(user):
+    roles = ["user"]
+    if user.is_admin:
+        roles.append("admin")
+
+    return roles
+
+
 @router.post("/login", response_model=LoginResponseSchema)
 async def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
@@ -36,7 +44,7 @@ async def login(
         )
 
     access_token = oauth2.create_access_token(
-        data={"user_id": user.id, "is_admin": user.is_admin}
+        data={"user_id": user.id, "roles": getRoles(user)}
     )
     refresh_token = oauth2.create_refresh_token(db, user.id)
 
@@ -77,6 +85,8 @@ async def refresh(
     if token_hash != user.refresh_token or token_expire_utc <= datetime.now(UTC):
         raise exception
 
-    access_token = oauth2.create_access_token(data={"user_id": user.id})
+    access_token = oauth2.create_access_token(
+        data={"user_id": user.id, "roles": getRoles(user)}
+    )
 
     return {"access_token": access_token, "token_type": "bearer"}
