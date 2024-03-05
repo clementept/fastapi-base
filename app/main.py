@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .backend.config import settings
 from .routers import auth, health, users
 
 app = FastAPI()
 
-origins = ["*"]
+origins = settings.cors_allowed_origins or ["*"]
 
 app.add_middleware(
     CORSMiddleware,

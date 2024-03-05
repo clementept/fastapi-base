@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int
     jwt_refresh_token_expire_minutes: int
 
+    cors_allowed_origins: list
+
     class Config:
         env_file = ".env"
 
