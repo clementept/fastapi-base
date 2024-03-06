@@ -59,7 +59,7 @@ async def login(
 
     response = JSONResponse(content=content)
     response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True, expires=cookie_expire
+        key="refresh_token", value=refresh_token, httponly=True, expires=cookie_expire, secure=True
     )
 
     return response
@@ -115,6 +115,8 @@ async def refresh(
     token_expire_utc = token_expire_object.replace(tzinfo=pytz.utc)
 
     if token_hash != user.refresh_token or token_expire_utc <= datetime.now(UTC):
+        print(f"token_hash: {token_hash} != user token_hash {user.refresh_token}")
+        print(f"Expired? {token_expire_utc <= datetime.now(UTC)}")
         raise exception
 
     access_token = oauth2.create_access_token(
