@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     test_database_name: str
     admin_email: str
     admin_password: str
+    base_url_suffix: str = "/api"
 
     jwt_secret_key: str
     jwt_algorythm: str
