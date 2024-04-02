@@ -59,7 +59,11 @@ async def login(
 
     response = JSONResponse(content=content)
     response.set_cookie(
-        key="refresh_token", value=refresh_token, httponly=True, expires=cookie_expire, secure=True
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        expires=cookie_expire,
+        secure=True,
     )
 
     return response
