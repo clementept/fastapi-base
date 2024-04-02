@@ -3,7 +3,6 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from alembic import op
 from app.backend.config import settings
 from app.backend.database import Base, get_db
 from app.main import app
@@ -75,7 +74,11 @@ def client(session):
             session.close()
 
     app.dependency_overrides[get_db] = override_get_db
-    yield TestClient(app)
+
+    test_client = TestClient(app)
+    test_client.base_url = str(test_client.base_url) +settings.base_url_suffix
+
+    yield test_client
 
 
 @pytest.fixture
