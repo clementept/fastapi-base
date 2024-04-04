@@ -16,6 +16,15 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=UserResponseSchema)
 def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
+    existing_user = (
+        db.query(UserModel).filter(UserModel.email == user.email.lower()).first()
+    )
+
+    if existing_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Username already taken"
+        )
+
     hashed_password = crypto.create_hash(user.password)
     user.password = hashed_password
 
