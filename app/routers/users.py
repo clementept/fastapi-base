@@ -27,6 +27,7 @@ def create_user(user: UserCreateSchema, db: Session = Depends(database.get_db)):
 
     hashed_password = crypto.create_hash(user.password)
     user.password = hashed_password
+    user.email = user.email.lower()
 
     new_user = UserModel(**user.model_dump())
     new_user.activation_code = str(uuid.uuid4())
