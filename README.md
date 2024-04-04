@@ -43,7 +43,13 @@ To run the project, follow these steps:
    ```
 
 
-2. **Run the project:**
+2. **Run migrations:**
+   ```bash
+   alembic upgrade head
+   ```
+
+
+3. **Run the project:**
    ```bash
    uvicorn app.main:app --reload
    ```
